@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ena ことばのテスト</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        @media print {
+            body { background: white; padding: 0; }
+            .page { box-shadow: none; margin: 0; page-break-after: always; }
+        }
+
+        body {
+            background: #888;
+            padding: 24px;
+            font-family: 'MS Mincho', 'Hiragino Mincho ProN', 'Yu Mincho', 'SimSun', serif;
+        }
+
+        /* ─── A4 page ─── */
+        .page {
+            width: 210mm;
+            min-height: 297mm;
+            background: #fff;
+            margin: 0 auto 30px;
+            padding: 10mm 14mm 10mm 14mm;
+            position: relative;
+            box-shadow: 3px 3px 14px rgba(0,0,0,.55);
+            overflow: hidden;
+        }
+
+        /* corner marks */
+        .cm { position: absolute; width: 11px; height: 11px; background: #000; }
+        .cm-tl { top: 4mm;  left:  4mm; }
+        .cm-tr { top: 4mm;  right: 4mm; }
+        .cm-bl { bottom: 4mm; left:  4mm; }
+        .cm-br { bottom: 4mm; right: 4mm; }
+
+        /* ═══════════════════════════════════════
+           PAGE 1
+        ═══════════════════════════════════════ */
+
+        /* header */
+        .hdr {
+            display: flex;
+            border: 1.5px solid #000;
+            margin-bottom: 5px;
+        }
+        .hdr-score {
+            min-width: 56px;
+            border-right: 1.5px solid #000;
+            display: flex; align-items: center; justify-content: center;
+            padding: 5px;
+        }
+        .score-box {
+            width: 46px; height: 46px;
+            border: 2px solid #000;
+        }
+        .hdr-main { flex: 1; display: flex; flex-direction: column; }
+        .hdr-title-row {
+            display: flex; align-items: center; gap: 8px;
+            border-bottom: 1.5px solid #000;
+            padding: 4px 8px;
+        }
+        .grade-dbox {
+            border: 1px dashed #777;
+            padding: 2px 8px;
+            font-size: 9.5px;
+            line-height: 1.5;
+            color: #333;
+        }
+        .title-big {
+            font-size: 21px;
+            font-weight: bold;
+            letter-spacing: 7px;
+            flex: 1;
+            text-align: center;
+        }
+        .hdr-add { font-size: 10px; text-align: right; padding-right: 4px; }
+        .hdr-fields {
+            display: flex;
+            font-size: 10.5px;
+        }
+        .hdr-f {
+            border-right: 1.5px solid #000;
+            padding: 3px 6px;
+            flex: 1;
+            line-height: 1.7;
+        }
+        .hdr-f:last-child { border-right: none; }
+        .hdr-f.wide { flex: 2; }
+
+        /* section common */
+        .sec { margin: 9px 0; }
+        .sec-head { display: flex; align-items: flex-start; gap: 6px; margin-bottom: 5px; }
+        .sec-lbl {
+            border: 1.5px solid #000;
+            padding: 2px 7px;
+            font-weight: bold;
+            font-size: 13px;
+            white-space: nowrap;
+        }
+        .sec-instr { font-size: 11px; line-height: 1.85; }
+
+        /* matching */
+        .match-outer {
+            position: relative;
+            height: 225px;
+            margin: 0 15px;
+        }
+        .match-l, .match-r {
+            position: absolute;
+            top: 0;
+            display: flex;
+            flex-direction: column;
+        }
+        .match-l { left: 10px; }
+        .match-r { right: 10px; align-items: flex-end; }
+        .mrow {
+            height: 45px;
+            display: flex; align-items: center; gap: 7px;
+            font-size: 13.5px;
+        }
+        .mrow.r { flex-direction: row-reverse; }
+        .dot {
+            width: 7px; height: 7px;
+            border-radius: 50%;
+            background: #000;
+            flex-shrink: 0;
+        }
+        .match-svg {
+            position: absolute; top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+        }
+
+        /* divider */
+        .hdiv { border: none; border-top: 2px solid #000; margin: 9px 0; }
+
+        /* section 2 */
+        .s2-wrap { display: flex; gap: 14px; }
+        .s2-qs { flex: 1.2; }
+        .s2-imgs { flex: 0.85; }
+
+        .qrow {
+            margin: 4px 0;
+            font-size: 11.5px;
+            line-height: 2;
+        }
+        .qrow .choices {
+            font-size: 10.5px;
+            color: #222;
+        }
+        .aline {
+            display: inline-block;
+            min-width: 72px;
+            border-bottom: 1.5px solid #000;
+            margin: 0 4px;
+            vertical-align: bottom;
+        }
+        .choice-pill {
+            display: inline-block;
+            border: 1px solid #555;
+            border-radius: 10px;
+            padding: 0 8px;
+            font-size: 10px;
+            margin: 0 2px;
+        }
+
+        /* image questions */
+        .iq { display: flex; align-items: flex-start; gap: 7px; margin: 5px 0; }
+        .iq-num { font-weight: bold; font-size: 12px; width: 16px; flex-shrink: 0; }
+        .iq-img {
+            border: 1px solid #999;
+            background: #f7f7f7;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        .iq-opts { font-size: 10.5px; line-height: 1.9; }
+
+        /* ═══════════════════════════════════════
+           PAGE 2
+        ═══════════════════════════════════════ */
+
+        .p2-body { display: flex; gap: 12px; }
+        .p2-left { flex: 1; }
+        .p2-right {
+            width: 92px;
+            display: flex; flex-direction: column; gap: 4px;
+            align-items: flex-end;
+        }
+        .p2ri {
+            display: flex; align-items: center; gap: 4px;
+        }
+        .p2ri-box {
+            width: 78px; height: 62px;
+            border: 1px solid #999;
+            background: #f5f5f5;
+            overflow: hidden;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .p2ri-n { font-size: 11px; font-weight: bold; width: 14px; }
+
+        /* word bank */
+        .wbank {
+            border: 1.5px solid #000;
+            padding: 4px 10px;
+            margin: 4px 0;
+            font-size: 11.5px;
+            display: flex; gap: 14px; flex-wrap: wrap;
+        }
+
+        /* blanks */
+        .blank-list { font-size: 12px; line-height: 2.2; margin-left: 6px; }
+        .blank-list span {
+            display: inline-block;
+            min-width: 75px;
+            border-bottom: 1.5px solid #000;
+            margin-left: 5px;
+            vertical-align: bottom;
+        }
+
+        /* oval choices */
+        .oval-row { display: flex; align-items: center; gap: 6px; margin: 4px 0; flex-wrap: wrap; }
+        .oval {
+            border: 1.5px solid #000;
+            border-radius: 18px;
+            padding: 2px 11px;
+            font-size: 11px;
+        }
+
+        /* mid section */
+        .mid-qs {
+            display: flex; gap: 8px; flex-wrap: wrap;
+            margin: 7px 0;
+        }
+        .mid-item { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+        .mid-img {
+            width: 68px; height: 55px;
+            border: 1px solid #999;
+            background: #f6f6f6;
+            overflow: hidden;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .mid-q { font-size: 10.5px; text-align: center; }
+
+        /* writing grids */
+        .grids-wrap {
+            display: flex; gap: 14px;
+            justify-content: center;
+            margin: 8px 0;
+        }
+        .grid-unit { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+        .grid-title { font-size: 10.5px; }
+        .wgtable {
+            border-collapse: collapse;
+            border: 2px solid #000;
+        }
+        .wgtable td {
+            width: 31px; height: 31px;
+            border: 1px solid #000;
+            text-align: center; vertical-align: middle;
+            font-size: 15px;
+            font-family: 'MS Gothic', 'Hiragino Kaku Gothic ProN', sans-serif;
+        }
+        .wgtable td.g { background: #f4f4f4; }
+        .wgtable td.dash { border-style: dashed; border-color: #bbb; }
+
+        /* footer */
+        .footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 2.5px solid #000;
+            padding-top: 6px;
+            margin-top: 10px;
+            font-size: 10px;
+        }
+        .footer-mid {
+            display: flex; align-items: center; gap: 18px;
+        }
+        .footer-sep {
+            border-left: 2px solid #000;
+            padding-left: 18px;
+            font-size: 10.5px;
+            line-height: 1.6;
+        }
+        .ena {
+            font-size: 28px;
+            font-style: italic;
+            font-weight: 900;
+            font-family: Arial, Helvetica, sans-serif;
+            letter-spacing: -1px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════════
+     PAGE 1  表面
+══════════════════════════════════════════════════════════ -->
+<div class="page">
+    <div class="cm cm-tl"></div>
+    <div class="cm cm-tr"></div>
+    <div class="cm cm-bl"></div>
+    <div class="cm cm-br"></div>
+
+    <div style="text-align:right;font-size:9px;margin-bottom:3px;">游ゲームID：1011052701</div>
+
+    <!-- ── HEADER ── -->
+    <div class="hdr">
+        <div class="hdr-score">
+            <div class="score-box"></div>
+        </div>
+        <div class="hdr-main">
+            <div class="hdr-title-row">
+                <div class="grade-dbox">
+                    もじのてすと<br>
+                    <span style="font-size:8px;">のこりてすと</span>
+                </div>
+                <div class="title-big">ことばのテスト</div>
+                <div class="hdr-add">加算審判</div>
+            </div>
+            <div class="hdr-fields">
+                <div class="hdr-f">ふりがな<br><span style="font-size:9px;">クラス　</span></div>
+                <div class="hdr-f wide">なまえ<br>&nbsp;</div>
+                <div class="hdr-f">組<br>&nbsp;</div>
+                <div class="hdr-f">番<br>&nbsp;</div>
+                <div class="hdr-f">学籍番号<br>&nbsp;</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── SECTION 一 : MATCHING ── -->
+    <div class="sec">
+        <div class="sec-head">
+            <span class="sec-lbl">一</span>
+            <span class="sec-instr">つぎのことばと　いみが　あうものを　せんで　むすびなさい。</span>
+        </div>
+
+        <div class="match-outer">
+            <!-- SVG connection lines (crossed, as drawn in original) -->
+            <svg class="match-svg" viewBox="0 0 560 225" preserveAspectRatio="none">
+                <!-- ちょう → サンドイッチ -->
+                <line x1="135" y1="22"  x2="430" y2="157" stroke="#444" stroke-width="1.6"/>
+                <!-- うさぎ → ジュース -->
+                <line x1="135" y1="67"  x2="430" y2="202" stroke="#444" stroke-width="1.6"/>
+                <!-- すずめ → コーヒー -->
+                <line x1="135" y1="112" x2="430" y2="90"  stroke="#666" stroke-width="1.5"/>
+                <!-- なべ   → ニュース -->
+                <line x1="135" y1="157" x2="430" y2="22"  stroke="#444" stroke-width="1.6"/>
+                <!-- むし   → スープ -->
+                <line x1="135" y1="202" x2="430" y2="112" stroke="#444" stroke-width="1.6"/>
+            </svg>
+
+            <!-- Left items -->
+            <div class="match-l" style="left:8px;">
+                <div class="mrow"><span>ちょう</span><span class="dot"></span></div>
+                <div class="mrow"><span>うさぎ</span><span class="dot"></span></div>
+                <div class="mrow"><span>すずめ</span><span class="dot"></span></div>
+                <div class="mrow"><span>なべ　</span><span class="dot"></span></div>
+                <div class="mrow"><span>むし　</span><span class="dot"></span></div>
+            </div>
+
+            <!-- Right items -->
+            <div class="match-r" style="right:8px;">
+                <div class="mrow r"><span>ニュース</span><span class="dot"></span></div>
+                <div class="mrow r"><span>コーヒー</span><span class="dot"></span></div>
+                <div class="mrow r"><span>スープ　</span><span class="dot"></span></div>
+                <div class="mrow r"><span>サンドイッチ</span><span class="dot"></span></div>
+                <div class="mrow r"><span>ジュース</span><span class="dot"></span></div>
+            </div>
+        </div>
+    </div>
+
+    <hr class="hdiv">
+
+    <!-- ── SECTION 二 : WORD SELECTION + IMAGE QUESTIONS ── -->
+    <div class="sec">
+        <div class="sec-head">
+            <span class="sec-lbl" style="border:2px solid #000;">二</span>
+            <span class="sec-instr">
+                （　）の　なかの　ことばを　つかって、□に　あう　ことばを　かきなさい。<br>
+                ただし、（　）の　なかの　ことばは　いちどしか　つかえません。
+            </span>
+        </div>
+
+        <div class="s2-wrap">
+            <!-- ── Left: 5 fill-in questions ── -->
+            <div class="s2-qs">
+                <div class="qrow">
+                    ①　<span class="choice-pill">時計</span><br>
+                    &emsp;<span class="choices">（　じかん　・　<u>とけい</u>　・　ながさ　）</span><br>
+                    &emsp;<span class="aline">&nbsp;</span>
+                </div>
+                <div class="qrow">
+                    ②　<span class="choice-pill">ジュース</span><br>
+                    &emsp;<span class="choices">（　のみもの　・　たべもの　・　スープ　）</span><br>
+                    &emsp;<span class="aline">&nbsp;</span>
+                </div>
+                <div class="qrow">
+                    ③　<span class="choice-pill">サンダル</span><br>
+                    &emsp;<span class="choices">（　<u>くつ</u>　・　ズボン　・　ぼうし　）</span><br>
+                    &emsp;<span class="aline">&nbsp;</span>
+                </div>
+                <div class="qrow">
+                    ④　<span class="choice-pill">ライオン</span><br>
+                    &emsp;<span class="choices">（　とり　・　<u>どうぶつ</u>　・　さかな　）</span><br>
+                    &emsp;<span class="aline">&nbsp;</span>
+                </div>
+                <div class="qrow">
+                    ⑤　<span class="choice-pill">スカーフ</span><br>
+                    &emsp;<span class="choices">（　<u>ふく</u>　・　かばん　・　かさ　）</span><br>
+                    &emsp;<span class="aline">&nbsp;</span>
+                </div>
+            </div>
+
+            <!-- ── Right: 3 image questions ── -->
+            <div class="s2-imgs">
+                <!-- ⑤ Window -->
+                <div class="iq">
+                    <div class="iq-num">⑤</div>
+                    <div class="iq-img" style="width:82px;height:67px;">
+                        <svg width="82" height="67" viewBox="0 0 82 67">
+                            <rect x="4" y="4" width="74" height="59" fill="#888" stroke="#000" stroke-width="2"/>
+                            <rect x="6"  y="6" width="34" height="55" fill="#bbb" stroke="#000" stroke-width="1"/>
+                            <rect x="42" y="6" width="34" height="55" fill="#bbb" stroke="#000" stroke-width="1"/>
+                            <line x1="4" y1="34" x2="78" y2="34" stroke="#000" stroke-width="1"/>
+                            <rect x="9"  y="9"  width="28" height="22" fill="#aed6f1" stroke="#aaa" stroke-width=".5"/>
+                            <rect x="45" y="9"  width="28" height="22" fill="#aed6f1" stroke="#aaa" stroke-width=".5"/>
+                            <rect x="9"  y="37" width="28" height="20" fill="#aed6f1" stroke="#aaa" stroke-width=".5"/>
+                            <rect x="45" y="37" width="28" height="20" fill="#aed6f1" stroke="#aaa" stroke-width=".5"/>
+                        </svg>
+                    </div>
+                    <div class="iq-opts">
+                        ア（　）まど<br>
+                        イ（　）ドア<br>
+                        ウ（○）まどわく
+                    </div>
+                </div>
+
+                <!-- ④ Glasses -->
+                <div class="iq">
+                    <div class="iq-num">④</div>
+                    <div class="iq-img" style="width:82px;height:60px;">
+                        <svg width="82" height="60" viewBox="0 0 82 60">
+                            <circle cx="22" cy="30" r="15" fill="none" stroke="#111" stroke-width="2.5"/>
+                            <circle cx="60" cy="30" r="15" fill="none" stroke="#111" stroke-width="2.5"/>
+                            <line x1="37" y1="30" x2="45" y2="30" stroke="#111" stroke-width="2.2"/>
+                            <line x1="7"  y1="25" x2="1"  y2="18" stroke="#111" stroke-width="2.2"/>
+                            <line x1="75" y1="25" x2="81" y2="18" stroke="#111" stroke-width="2.2"/>
+                        </svg>
+                    </div>
+                    <div class="iq-opts">
+                        ア（　）サングラス<br>
+                        イ（　）メガネ<br>
+                        ウ（○）めがね入れ
+                    </div>
+                </div>
+
+                <!-- ③ Beret hat -->
+                <div class="iq">
+                    <div class="iq-num">③</div>
+                    <div class="iq-img" style="width:82px;height:62px;">
+                        <svg width="82" height="62" viewBox="0 0 82 62">
+                            <ellipse cx="41" cy="51" rx="34" ry="9" fill="#aaa" stroke="#555" stroke-width="1.2"/>
+                            <path d="M 14 48 Q 16 18 41 14 Q 66 18 68 48" fill="#ccc" stroke="#555" stroke-width="2"/>
+                            <ellipse cx="41" cy="14" rx="11" ry="4.5" fill="#b8b8b8" stroke="#555" stroke-width="1"/>
+                        </svg>
+                    </div>
+                    <div class="iq-opts">
+                        ア（　）ぼうし<br>
+                        イ（○）ベレーぼう<br>
+                        ウ（　）かさ
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════
+     PAGE 2  裏面
+══════════════════════════════════════════════════════════ -->
+<div class="page">
+    <div class="cm cm-tl"></div>
+    <div class="cm cm-tr"></div>
+    <div class="cm cm-bl"></div>
+    <div class="cm cm-br"></div>
+
+    <!-- ── TOP: section + object images on right ── -->
+    <div class="p2-body">
+
+        <!-- Left: sections -->
+        <div class="p2-left">
+
+            <!-- SECTION 二(back) : identify objects from pictures -->
+            <div class="sec">
+                <div class="sec-head">
+                    <span class="sec-lbl" style="border:2px solid #000;">二</span>
+                    <span class="sec-instr">
+                        えを　みて　（　）に　あう　ことばを　□の　なかから　えらんで　かきなさい。
+                    </span>
+                </div>
+
+                <div class="wbank">
+                    <span>タイヤ</span><span>ケーキ</span><span>カメラ</span><span>ボタン</span><span>コルク抜き</span>
+                </div>
+
+                <div class="blank-list">
+                    <div>①　<span>&nbsp;</span></div>
+                    <div>②　<span>&nbsp;</span></div>
+                    <div>③　<span>&nbsp;</span></div>
+                    <div>④　<span>&nbsp;</span></div>
+                    <div>⑤　<span>&nbsp;</span></div>
+                </div>
+            </div>
+
+            <hr class="hdiv">
+
+            <!-- SECTION 三 : smaller image vocabulary -->
+            <div class="sec">
+                <div class="sec-head">
+                    <span class="sec-lbl">三</span>
+                    <span class="sec-instr">
+                        したの　えを　みて、ことばを　えらびなさい。<br>
+                        （　）に　あう　ことばを　○で　かこみなさい。
+                    </span>
+                </div>
+
+                <div class="mid-qs">
+                    <!-- ① hairbrush -->
+                    <div class="mid-item">
+                        <div class="mid-img">
+                            <svg width="64" height="52" viewBox="0 0 64 52">
+                                <rect x="4"  y="22" width="56" height="14" rx="6" fill="#7B3F00" stroke="#333" stroke-width="1.2"/>
+                                <rect x="4"  y="24" width="10" height="10" rx="3" fill="#A0522D"/>
+                                <line x1="17" y1="24" x2="17" y2="34" stroke="#111" stroke-width="1.2"/>
+                                <line x1="22" y1="24" x2="22" y2="34" stroke="#111" stroke-width="1.2"/>
+                                <line x1="27" y1="24" x2="27" y2="34" stroke="#111" stroke-width="1.2"/>
+                                <line x1="32" y1="24" x2="32" y2="34" stroke="#111" stroke-width="1.2"/>
+                                <line x1="37" y1="24" x2="37" y2="34" stroke="#111" stroke-width="1.2"/>
+                                <line x1="42" y1="24" x2="42" y2="34" stroke="#111" stroke-width="1.2"/>
+                                <line x1="47" y1="24" x2="47" y2="34" stroke="#111" stroke-width="1.2"/>
+                                <line x1="52" y1="24" x2="52" y2="34" stroke="#111" stroke-width="1.2"/>
+                            </svg>
+                        </div>
+                        <div class="mid-q">①<br>（くし・ブラシ・ほうき）</div>
+                    </div>
+
+                    <!-- ② scarf -->
+                    <div class="mid-item">
+                        <div class="mid-img">
+                            <svg width="64" height="52" viewBox="0 0 64 52">
+                                <path d="M4,26 Q16,6 32,10 Q48,14 60,26 Q48,42 32,44 Q16,46 4,26Z"
+                                      fill="#4a6fa5" stroke="#2c4a7c" stroke-width="1.2"/>
+                                <line x1="8"  y1="26" x2="56" y2="26" stroke="#7fa8d8" stroke-width="1" stroke-dasharray="4,3"/>
+                                <line x1="6"  y1="20" x2="58" y2="20" stroke="#7fa8d8" stroke-width="1" stroke-dasharray="4,3"/>
+                                <line x1="6"  y1="32" x2="58" y2="32" stroke="#7fa8d8" stroke-width="1" stroke-dasharray="4,3"/>
+                            </svg>
+                        </div>
+                        <div class="mid-q">②<br>（スカーフ・くつ・てぶくろ）</div>
+                    </div>
+
+                    <!-- ③ peanuts -->
+                    <div class="mid-item">
+                        <div class="mid-img">
+                            <svg width="64" height="52" viewBox="0 0 64 52">
+                                <ellipse cx="18" cy="30" rx="13" ry="9"  fill="#C8A236" stroke="#8B6914" stroke-width="1.2"/>
+                                <ellipse cx="36" cy="22" rx="11" ry="8"  fill="#D4AB40" stroke="#8B6914" stroke-width="1.2"/>
+                                <ellipse cx="48" cy="35" rx="10" ry="7"  fill="#C8A236" stroke="#8B6914" stroke-width="1.2"/>
+                                <line x1="12" y1="30" x2="24" y2="30" stroke="#8B6914" stroke-width=".8" stroke-dasharray="2,2"/>
+                                <line x1="31" y1="22" x2="41" y2="22" stroke="#8B6914" stroke-width=".8" stroke-dasharray="2,2"/>
+                            </svg>
+                        </div>
+                        <div class="mid-q">③<br>（まめ・くり・くだもの）</div>
+                    </div>
+
+                    <!-- ④ camera -->
+                    <div class="mid-item">
+                        <div class="mid-img">
+                            <svg width="64" height="52" viewBox="0 0 64 52">
+                                <rect x="6"  y="14" width="52" height="30" rx="4" fill="#1a1a1a" stroke="#444" stroke-width="1.2"/>
+                                <circle cx="32" cy="29" r="11" fill="#333" stroke="#888" stroke-width="1"/>
+                                <circle cx="32" cy="29" r="7"  fill="#222"/>
+                                <circle cx="32" cy="29" r="3"  fill="#111"/>
+                                <rect x="18" y="8" width="13" height="7" rx="2" fill="#222" stroke="#555" stroke-width="1"/>
+                                <rect x="50" y="16" width="8" height="8" rx="2" fill="#2a2a2a"/>
+                            </svg>
+                        </div>
+                        <div class="mid-q">④<br>（カメラ・テレビ・でんわ）</div>
+                    </div>
+
+                    <!-- ⑤ comb/object -->
+                    <div class="mid-item">
+                        <div class="mid-img">
+                            <svg width="64" height="52" viewBox="0 0 64 52">
+                                <path d="M6,18 Q32,6 58,18 Q58,38 32,46 Q6,38 6,18Z"
+                                      fill="#c87941" stroke="#885520" stroke-width="1.2"/>
+                                <line x1="12" y1="26" x2="52" y2="26" stroke="#ffcc88" stroke-width="1.2"/>
+                                <line x1="10" y1="20" x2="54" y2="20" stroke="#ffcc88" stroke-width="1.2"/>
+                                <line x1="10" y1="32" x2="54" y2="32" stroke="#ffcc88" stroke-width="1.2"/>
+                            </svg>
+                        </div>
+                        <div class="mid-q">⑤<br>（バッグ・きんちゃく・さいふ）</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right: object photos for Section 二 -->
+        <div class="p2-right">
+            <!-- ⑤ tire -->
+            <div class="p2ri">
+                <div class="p2ri-box">
+                    <svg width="74" height="60" viewBox="0 0 74 60">
+                        <circle cx="37" cy="30" r="26" fill="#111" stroke="#000" stroke-width="1"/>
+                        <circle cx="37" cy="30" r="16" fill="#555" stroke="#777" stroke-width="1"/>
+                        <circle cx="37" cy="30" r="7"  fill="#333"/>
+                        <line x1="37" y1="4"  x2="37" y2="56" stroke="#666" stroke-width=".6"/>
+                        <line x1="11" y1="30" x2="63" y2="30" stroke="#666" stroke-width=".6"/>
+                        <line x1="18" y1="11" x2="56" y2="49" stroke="#666" stroke-width=".6"/>
+                        <line x1="56" y1="11" x2="18" y2="49" stroke="#666" stroke-width=".6"/>
+                    </svg>
+                </div>
+                <div class="p2ri-n">⑤</div>
+            </div>
+
+            <!-- ④ layered cake -->
+            <div class="p2ri">
+                <div class="p2ri-box">
+                    <svg width="74" height="60" viewBox="0 0 74 60">
+                        <rect x="7"  y="44" width="60" height="12" fill="#f0c888" stroke="#a07830" stroke-width="1"/>
+                        <rect x="12" y="32" width="50" height="13" fill="#e8b860" stroke="#a07830" stroke-width="1"/>
+                        <rect x="17" y="20" width="40" height="13" fill="#f5d09a" stroke="#a07830" stroke-width="1"/>
+                        <line x1="7"  y1="44" x2="67" y2="44" stroke="#c89050" stroke-width=".8"/>
+                        <line x1="12" y1="32" x2="62" y2="32" stroke="#c89050" stroke-width=".8"/>
+                        <rect x="35" y="11" width="4" height="10" fill="#cc3333"/>
+                        <circle cx="37" cy="10" r="4" fill="#ffaaaa" stroke="#cc3333" stroke-width=".8"/>
+                    </svg>
+                </div>
+                <div class="p2ri-n">④</div>
+            </div>
+
+            <!-- ③ camera (dark/SLR) -->
+            <div class="p2ri">
+                <div class="p2ri-box">
+                    <svg width="74" height="60" viewBox="0 0 74 60">
+                        <rect x="6"  y="14" width="62" height="38" rx="5" fill="#1c1c1c" stroke="#444" stroke-width="1.2"/>
+                        <circle cx="37" cy="33" r="14" fill="#333" stroke="#888" stroke-width="1.2"/>
+                        <circle cx="37" cy="33" r="9"  fill="#222"/>
+                        <circle cx="37" cy="33" r="4"  fill="#111"/>
+                        <rect x="20" y="8"  width="16" height="7" rx="2" fill="#1c1c1c" stroke="#555" stroke-width="1"/>
+                        <rect x="55" y="16" width="9"  height="9" rx="2" fill="#2a2a2a"/>
+                        <circle cx="12" cy="20" r="3" fill="#888"/>
+                    </svg>
+                </div>
+                <div class="p2ri-n">③</div>
+            </div>
+
+            <!-- ② buttons / coins -->
+            <div class="p2ri">
+                <div class="p2ri-box">
+                    <svg width="74" height="60" viewBox="0 0 74 60">
+                        <circle cx="20" cy="20" r="13" fill="#d4d0c0" stroke="#999" stroke-width="1.2"/>
+                        <circle cx="20" cy="20" r="5"  fill="#b8b498" stroke="#999" stroke-width=".8"/>
+                        <circle cx="17" cy="17" r="1.8" fill="#aaa"/>
+                        <circle cx="23" cy="17" r="1.8" fill="#aaa"/>
+                        <circle cx="17" cy="23" r="1.8" fill="#aaa"/>
+                        <circle cx="23" cy="23" r="1.8" fill="#aaa"/>
+                        <circle cx="52" cy="20" r="13" fill="#e0dbc0" stroke="#999" stroke-width="1.2"/>
+                        <circle cx="52" cy="20" r="5"  fill="#c8c3a0" stroke="#999" stroke-width=".8"/>
+                        <circle cx="36" cy="46" r="12" fill="#c8c4b0" stroke="#888" stroke-width="1.2"/>
+                        <circle cx="58" cy="46" r="12" fill="#d4d0bc" stroke="#888" stroke-width="1.2"/>
+                    </svg>
+                </div>
+                <div class="p2ri-n">②</div>
+            </div>
+
+            <!-- ① corkscrew -->
+            <div class="p2ri">
+                <div class="p2ri-box">
+                    <svg width="74" height="60" viewBox="0 0 74 60">
+                        <rect x="27" y="5" width="20" height="9" rx="4" fill="#999" stroke="#666" stroke-width="1.2"/>
+                        <line x1="37" y1="14" x2="37" y2="36" stroke="#888" stroke-width="3.5"/>
+                        <path d="M 31 36 Q 21 43 28 52 Q 37 60 46 52 Q 53 43 43 36"
+                              fill="none" stroke="#888" stroke-width="3" stroke-linecap="round"/>
+                    </svg>
+                </div>
+                <div class="p2ri-n">①</div>
+            </div>
+        </div>
+    </div>
+
+    <hr class="hdiv">
+
+    <!-- ── SECTION 一 (back page) : WRITING GRIDS ── -->
+    <div class="sec">
+        <div class="sec-head">
+            <span class="sec-lbl">一</span>
+            <span class="sec-instr">
+                したの　もじを　みて　おなじように　なぞりなさい。また、つぎの　ますに　かきなさい。
+            </span>
+        </div>
+
+        <div class="grids-wrap">
+
+            <!-- Left grid: hiragana は行 -->
+            <div class="grid-unit">
+                <div class="grid-title">　は　行（ひらがな）</div>
+                <table class="wgtable">
+                    <tr>
+                        <td class="g">は</td><td class="g">ひ</td><td class="g">ふ</td><td class="g">へ</td><td class="g">ほ</td>
+                    </tr>
+                    <tr>
+                        <td class="dash"></td><td class="dash"></td><td class="dash"></td><td class="dash"></td><td class="dash"></td>
+                    </tr>
+                    <tr>
+                        <td></td><td></td><td></td><td></td><td></td>
+                    </tr>
+                    <tr>
+                        <td class="g">ば</td><td class="g">び</td><td class="g">ぶ</td><td class="g">べ</td><td class="g">ぼ</td>
+                    </tr>
+                    <tr>
+                        <td class="dash"></td><td class="dash"></td><td class="dash"></td><td class="dash"></td><td class="dash"></td>
+                    </tr>
+                    <tr>
+                        <td></td><td></td><td></td><td></td><td></td>
+                    </tr>
+                    <tr>
+                        <td class="g">ぱ</td><td class="g">ぴ</td><td class="g">ぷ</td><td class="g">ぺ</td><td class="g">ぽ</td>
+                    </tr>
+                    <tr>
+                        <td class="dash"></td><td class="dash"></td><td class="dash"></td><td class="dash"></td><td class="dash"></td>
+                    </tr>
+                    <tr>
+                        <td></td><td></td><td></td><td></td><td></td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- Right grid: katakana ハ行 -->
+            <div class="grid-unit">
+                <div class="grid-title">　ハ　行（カタカナ）</div>
+                <table class="wgtable">
+                    <tr>
+                        <td class="g">ハ</td><td class="g">ヒ</td><td class="g">フ</td><td class="g">ヘ</td><td class="g">ホ</td>
+                    </tr>
+                    <tr>
+                        <td class="dash"></td><td class="dash"></td><td class="dash"></td><td class="dash"></td><td class="dash"></td>
+                    </tr>
+                    <tr>
+                        <td></td><td></td><td></td><td></td><td></td>
+                    </tr>
+                    <tr>
+                        <td class="g">バ</td><td class="g">ビ</td><td class="g">ブ</td><td class="g">ベ</td><td class="g">ボ</td>
+                    </tr>
+                    <tr>
+                        <td class="dash"></td><td class="dash"></td><td class="dash"></td><td class="dash"></td><td class="dash"></td>
+                    </tr>
+                    <tr>
+                        <td></td><td></td><td></td><td></td><td></td>
+                    </tr>
+                    <tr>
+                        <td class="g">パ</td><td class="g">ピ</td><td class="g">プ</td><td class="g">ペ</td><td class="g">ポ</td>
+                    </tr>
+                    <tr>
+                        <td class="dash"></td><td class="dash"></td><td class="dash"></td><td class="dash"></td><td class="dash"></td>
+                    </tr>
+                    <tr>
+                        <td></td><td></td><td></td><td></td><td></td>
+                    </tr>
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ── FOOTER ── -->
+    <div class="footer">
+        <div>点数満点　100点</div>
+        <div class="footer-mid">
+            <div>
+                <div style="font-size:11px;font-weight:bold;">国語テスト　ことばのテスト</div>
+            </div>
+            <div class="footer-sep">
+                タコ年生　こくご<br>
+                よのなかの　ことば
+            </div>
+            <div class="ena">ena</div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
